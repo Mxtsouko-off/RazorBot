@@ -108,7 +108,7 @@ bot = commands.Bot(
     command_prefix='+',
     intents=disnake.Intents.all(),
     help_command=None,
-    test_guilds=[1307490956081369158],  
+    test_guilds=[os.getenv('GUILD_ID')],  
     command_sync_flags=command_sync_flags,
 )
 
