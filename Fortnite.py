@@ -99,7 +99,7 @@ async def before_daily_task():
     await bot.wait_until_ready()
     wait_time = time_until_next_1am()
     print(f"Waiting {wait_time / 60:.2f} minutes until the next 1 AM task execution.")
-    await asyncio.sleep(wait_time)  # Attendre jusqu'à 1h du matin avant de lancer la première exécution
+    await asyncio.sleep(wait_time)  
                 
 command_sync_flags = commands.CommandSyncFlags.default()
 command_sync_flags.sync_commands_debug = True
@@ -108,7 +108,7 @@ bot = commands.Bot(
     command_prefix='+',
     intents=disnake.Intents.all(),
     help_command=None,
-    test_guilds=[os.getenv('GUILD_ID')],  
+    test_guilds=[1304168745845129297],  
     command_sync_flags=command_sync_flags,
 )
 
