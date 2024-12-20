@@ -47,7 +47,7 @@ def fetch_news(news_type):
     
 def time_until_next_1am():
     now = datetime.now()
-    next_run = datetime.combine(now.date(), time(1, 0))  
+    next_run = datetime.combine(now.date(), time(1, 0)) 
     if now >= next_run:  
         next_run += timedelta(days=1)
     return (next_run - now).total_seconds()
@@ -97,9 +97,13 @@ async def daily_task():
 @daily_task.before_loop
 async def before_daily_task():
     await bot.wait_until_ready()
+
     wait_time = time_until_next_1am()
     print(f"Waiting {wait_time / 60:.2f} minutes until the next 1 AM task execution.")
-    await asyncio.sleep(wait_time)  
+    await asyncio.sleep(wait_time) 
+
+    print("First execution after bot restart.")
+    await daily_task()  
                 
 command_sync_flags = commands.CommandSyncFlags.default()
 command_sync_flags.sync_commands_debug = True
@@ -432,7 +436,6 @@ async def dumper(inter: disnake.ApplicationCommandInteraction, file: disnake.Att
 
         await inter.edit_original_message(content="Your file has been successfully edited. :")
         await inter.followup.send(file=disnake.File(output_file_path), ephemeral=True)
-        time.sleep(5)
         os.remove(output_file_path)
 
     except json.JSONDecodeError:
