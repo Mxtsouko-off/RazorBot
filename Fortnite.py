@@ -5,8 +5,11 @@ import time
 import requests
 import asyncio
 import json
-from datetime import datetime
+from datetime import datetime, timedelta, time
 import re
+import flask
+from flask import Flask, jsonify, request
+from threading import Thread
 from io import BytesIO
 import os
 from functions.AccountID import Get_Account_ID
@@ -42,7 +45,14 @@ def fetch_news(news_type):
         return {'error': f"Error {response.status_code}: {response.text}"}
     
     
-@tasks.loop(time=time(1, 0)) 
+def time_until_next_1am():
+    now = datetime.now()
+    next_run = datetime.combine(now.date(), time(1, 0))  
+    if now >= next_run:  
+        next_run += timedelta(days=1)
+    return (next_run - now).total_seconds()
+
+@tasks.loop(hours=24) 
 async def daily_task():
     current_date = datetime.now().strftime('%d-%m')
     file_name = f"{current_date}-RazorMissionDev.json"
@@ -84,23 +94,12 @@ async def daily_task():
     except Exception as e:
         print(f"An unexpected error occurred: {str(e)}")
 
-
 @daily_task.before_loop
 async def before_daily_task():
     await bot.wait_until_ready()
-    print("Bot is ready. Waiting for the first execution of the daily task.")
-    
-    
-
-@daily_task.before_loop
-async def before_daily_task():
-    """
-    Attend que le bot soit prêt avant de démarrer la tâche quotidienne.
-    """
-    await bot.wait_until_ready()
-    print("Le bot est prêt, la tâche quotidienne est en attente de 1h.")
-
-
+    wait_time = time_until_next_1am()
+    print(f"Waiting {wait_time / 60:.2f} minutes until the next 1 AM task execution.")
+    await asyncio.sleep(wait_time)  # Attendre jusqu'à 1h du matin avant de lancer la première exécution
                 
 command_sync_flags = commands.CommandSyncFlags.default()
 command_sync_flags.sync_commands_debug = True
@@ -116,6 +115,7 @@ bot = commands.Bot(
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user}.")
+    daily_task.start()
 
 @bot.slash_command(name='getid', description="Get account ID using display name")
 async def getid(ctx, epic: str):
@@ -451,6 +451,20 @@ async def on_application_command_error(ctx, error):
         pass
 
 
+app = Flask('')
+
+@app.route('/')
+def main():
+    return f"Logged in as {bot.user}."
+
+def run():
+    app.run(host="0.0.0.0", port=8080)
+
+def keep_alive():
+    server = Thread(target=run)
+    server.start()
+
+keep_alive()
 
 
 bot.run(os.getenv('TOKEN'))
