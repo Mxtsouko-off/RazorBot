@@ -464,7 +464,7 @@ async def dumper(inter: disnake.ApplicationCommandInteraction, file: disnake.Att
         
 @bot.slash_command(description='find player in fortnitedb')
 async def dbfinder(ctx, epic:str):
-    linkdb = await DBLookup(epic)
+    linkdb = await DBLookup.search(epic)
     em = disnake.Embed(title='***/RazorVerse/DBFinder*** 🔎', description=f'click on the boutton or: {linkdb}', color=disnake.Color.green())
     class DBLINK(disnake.ui.Button):
             def __init__(self):
