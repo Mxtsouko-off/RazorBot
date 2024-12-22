@@ -19,6 +19,8 @@ from functions.Brstat import Brstat
 from functions.Dumper import DumperFile
 from functions.MissionsDev import MissionDev
 from functions.Status import Status
+from functions.DBFinder import DBLookup
+import random
 
 Missions = os.getenv("MissionID")
 
@@ -57,7 +59,7 @@ async def daily_task():
     current_date = datetime.now().strftime('%d-%m')
     file_name = f"{current_date}-RazorMissionDev.json"
     file_path = os.path.join(os.getcwd(), file_name)
-    channel = bot.get_channel(Missions)
+    channel = bot.get_channel(1319581165153161226)
 
     if channel is None:
         print("Channel not found. Please check the channel ID.")
@@ -120,6 +122,23 @@ bot = commands.Bot(
 async def on_ready():
     print(f"Logged in as {bot.user}.")
     daily_task.start()
+    
+@tasks.loop(seconds=3)
+async def statut():
+    activity_list = ["https://dsc.gg/stwboost", "➕!RazorPrem", "!By Mxtsouko 🎈"]
+    selected = random.choice(activity_list)
+    status_list = [disnake.Status.idle, disnake.Status.do_not_disturb, disnake.Status.online]
+    selected_status = random.choice(status_list)
+
+    await bot.change_presence(
+        status=selected_status,
+        activity=disnake.Activity(
+            type=disnake.ActivityType.streaming,
+            name=selected,
+            url='https://www.twitch.tv/mxtsouko'
+        )
+    )
+
 
 @bot.slash_command(name='getid', description="Get account ID using display name")
 async def getid(ctx, epic: str):
@@ -442,6 +461,19 @@ async def dumper(inter: disnake.ApplicationCommandInteraction, file: disnake.Att
         await inter.edit_original_message(content="The file sent is not a valid JSON file.")
     except Exception as e:
         await inter.edit_original_message(content=f"An error occurred while processing: {e}")
+        
+@bot.slash_command(description='find player in fortnitedb')
+async def dbfinder(ctx, epic:str):
+    linkdb = await DBLookup(epic)
+    em = disnake.Embed(title='***/RazorVerse/DBFinder*** 🔎', description=f'click on the boutton or: {linkdb}', color=disnake.Color.green())
+    class DBLINK(disnake.ui.Button):
+            def __init__(self):
+                super().__init__(label=f"click to open player: {epic} in FortniteDB", style=disnake.ButtonStyle.link, url=f"{linkdb}")
+                
+
+    view = disnake.ui.View()
+    view.add_item(DBLINK())
+    await ctx.send(embed=em, view=view, ephemeral=True)
 
     
 @bot.event
