@@ -54,41 +54,41 @@ async def daily_task():
     file_path = os.path.join(os.getcwd(), file_name)
     channel = bot.get_channel(Missions)
 
-    if channel is None:
-        print("Channel not found. Please check the channel ID.")
-        return
-
-    if not os.path.exists(file_path):
-        load_file = await MissionDev.run()
-
-        if not load_file:
-            print("An error occurred while generating the file.")
-            return
-
+    for guild in bot.guilds:
+        channel = disnake.utils.get(guild.text_channels, name='°﹕📍﹒missions-file')
+        role = disnake.utils.get(guild.roles, name='🔔 ‶MissionsFile″')
+        
+    if channel and role:
         if not os.path.exists(file_path):
-            print("File was not created even though MissionDev.run() succeeded.")
-            return
+            load_file = await MissionDev.run()
 
-    try:
-        embed = disnake.Embed(
-            title="`🏔️` ***Razor/MissionDev***",
-            description="Here you can download the daily missions file.",
-            color=disnake.Color.blue(),
-        )
-        embed.set_thumbnail(
-            url="https://stw-planner.com/images/Heroes/Ninja/T-Ninja-HID-Ninja-028-Razor-SR-T01-L.png"
-        )
+            if not load_file:
+                print("An error occurred while generating the file.")
+                return
 
-        with open(file_path, "rb") as f:
-            file = disnake.File(f, filename=file_name)
-            await channel.send('Test {1}')
-            await channel.send(embed=embed, file=file)
+            if not os.path.exists(file_path):
+                print("File was not created even though MissionDev.run() succeeded.")
+                return
 
-        await asyncio.sleep(30)
-        os.remove(file_path)
-        print(f"File {file_name} deleted successfully.")
-    except Exception as e:
-        print(f"An unexpected error occurred: {str(e)}")
+        try:
+            embed = disnake.Embed(
+                title="`🏔️` ***Razor/MissionDev***",
+                description="Here you can download the daily missions file.",
+                color=disnake.Color.blue(),
+            )
+            embed.set_thumbnail(
+                url="https://stw-planner.com/images/Heroes/Ninja/T-Ninja-HID-Ninja-028-Razor-SR-T01-L.png"
+            )
+
+            with open(file_path, "rb") as f:
+                file = disnake.File(f, filename=file_name)
+                await channel.send(embed=embed, file=file)
+
+            await asyncio.sleep(30)
+            os.remove(file_path)
+            print(f"File {file_name} deleted successfully.")
+        except Exception as e:
+            print(f"An unexpected error occurred: {str(e)}")
 
 
 command_sync_flags = commands.CommandSyncFlags.default()
@@ -524,7 +524,7 @@ descrip = '''
 @bot.slash_command(description='Venture Info')
 async def venture(ctx):
     em = disnake.Embed(title='**🌴 Razor/Venture**', description=descrip, color=disnake.Color.dark_orange())
-    em.set_footer(text=' 🌴 **RazorVerse** *!*')
+    em.set_footer(text=' 🌴 RazorVerse !')
     await ctx.send(embed=em, ephemeral=True)
 
     
