@@ -46,20 +46,13 @@ def fetch_news(news_type):
     else:
         return {'error': f"Error {response.status_code}: {response.text}"}
     
-    
-def time_until_next_1am():
-    now = datetime.now()
-    next_run = datetime.combine(now.date(), time(1, 0)) 
-    if now >= next_run:  
-        next_run += timedelta(days=1)
-    return (next_run - now).total_seconds()
 
-@tasks.loop(hours=24) 
+@tasks.loop(hours=5) 
 async def daily_task():
     current_date = datetime.now().strftime('%d-%m')
-    file_name = f"{current_date}-RazorMissionDev.json"
+    file_name = f"data/{current_date}-RazorMissionDev.json"
     file_path = os.path.join(os.getcwd(), file_name)
-    channel = bot.get_channel(1319581165153161226)
+    channel = bot.get_channel(Missions)
 
     if channel is None:
         print("Channel not found. Please check the channel ID.")
@@ -88,6 +81,7 @@ async def daily_task():
 
         with open(file_path, "rb") as f:
             file = disnake.File(f, filename=file_name)
+            await channel.send('Test {1}')
             await channel.send(embed=embed, file=file)
 
         await asyncio.sleep(30)
@@ -96,17 +90,7 @@ async def daily_task():
     except Exception as e:
         print(f"An unexpected error occurred: {str(e)}")
 
-@daily_task.before_loop
-async def before_daily_task():
-    await bot.wait_until_ready()
 
-    wait_time = time_until_next_1am()
-    print(f"Waiting {wait_time / 60:.2f} minutes until the next 1 AM task execution.")
-    await asyncio.sleep(wait_time) 
-
-    print("First execution after bot restart.")
-    await daily_task()  
-                
 command_sync_flags = commands.CommandSyncFlags.default()
 command_sync_flags.sync_commands_debug = True
 
@@ -121,7 +105,9 @@ bot = commands.Bot(
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user}.")
+    Server.keep_alive()
     daily_task.start()
+    statut.start()
     
 @tasks.loop(seconds=3)
 async def statut():
@@ -474,6 +460,56 @@ async def dbfinder(ctx, epic:str):
     view = disnake.ui.View()
     view.add_item(DBLINK())
     await ctx.send(embed=em, view=view, ephemeral=True)
+    
+descrip = '''
+> `🌴` **Razor/Venture**  *!*
+> 
+>     `Required XP to Level 50:`
+>         `🍄` `x1919450`
+> 
+>     `🎈` **`Venture Level:`**
+> 
+>         `⚡` `Lv 10 | PL 23 | 68,175`
+>         `⚡` `Lv 11 | PL 34 | 81,00`
+>         `⚡` `Lv 15 | PL 46 | 147,100`
+>         `⚡` `Lv 20 | PL 58 | 257,250`
+>         `⚡` `Lv 23 | PL 70 | 337,500`
+>         `⚡` `Lv 28 | PL 82 | 499,475`
+>         `⚡` `Lv 31 | PL 94 | 617,350`
+>         `⚡` `Lv 34 | PL 108 | 753,025`
+>         `⚡` `Lv 39 | PL 124 | 1,028,275`
+>         `⚡` `Lv 43 | PL 140 | 1,201,140`
+>     
+>     `🎁` **`Venture Rewards:`**
+> 
+>         `🌴` `Lv 5` | `21700 XP`| <:PinataGold:1320865433557139537> `x1 Jackpot Llama`
+>         `🌴` `Lv 10` | `68175 XP`| <:PinataGold:1320865433557139537> `x1 Jackpot Llama`
+>         `🌴` `Lv 13` | `110775 XP`| <:WeaponVoucher:1320866203836743742> `x1 Weapon Voucher`
+>         `🌴` `Lv 16` | `166900 XP`| <:EvolverarityLegend:1320866308300214272> `x100 Legendary flux`
+>         `🌴` `Lv 17` | `187550 XP`| <:WeaponRePerkResource:1320866425543327804> `x1 Core RE-PERK!`
+>         `🌴` `Lv 20` | `257250 XP`| <:HeroRecruitment:1320866533320163450> `x1 Hero Voucher`
+>         `🌴` `Lv 22` | `309325 XP`| <:EvolverarityLegend:1320866308300214272> `x100 Legendary flux`
+>         `🌴` `Lv 25` | `397100 XP`| <:SurvivorPromotion:1320866667382964224> `x1 Survivor Supercharger`
+>         `🌴` `Lv 28` | `499475 XP`| <:TrapPromotion:1320867015111479329> `x1 Trap Supercharger`
+>         `🌴` `Lv 31` | `617350 XP`| <:SurvivorPromotion:1320866667382964224> `x2 Survivor Supercharger`
+>         `🌴` `Lv 33` | `704875 XP`| <:Perkup_legendary:1320867090361483327> `x450 Legendary perk up`
+>         `🌴` `Lv 34` | `753025 XP`| <:HeroPromotion:1320867191742009375> `x1 Hero Supercharger`
+>         `🌴` `Lv 37` | `909200 XP`| <:SurvivorPromotion:1320866667382964224> `x3 Survivor Supercharger`
+>         `🌴` `Lv 40` | `1091375 XP`| <:WeaponPromotion:1320867301238640690> `x1 Weapon Supercharger`
+>         `🌴` `Lv 42` | `1227575 XP`| <:SurvivorPromotion:1320866667382964224> `x4 Survivor Supercharger`
+>         `🌴` `Lv 44` | `1377550 XP`| <:HeroPromotion:1320867191742009375> `x1 Hero Supercharger`
+>         `🌴` `Lv 46` | `1542350 XP`| <:SurvivorPromotion:1320866667382964224> `x6 Survivor Supercharger`
+>         `🌴` `Lv 47` | `1631400 XP`| <:Perkup_legendary:1320867090361483327> `x600 Legendary perk up`
+>         `🌴` `Lv 48` | `1723950 XP`| <:TrapPromotion:1320867015111479329> `x1 Trap Supercharger`
+>         `🌴` `Lv 49` | `1819950 XP`| <:HeroPromotion:1320867191742009375> `x1 Hero Supercharger`
+>         `🌴` `Lv 50` | `1919450 XP`| <:WeaponPromotion:1320867301238640690> `x1 Weapon Supercharger`
+'''
+    
+@bot.slash_command(description='Venture Info')
+async def venture(ctx):
+    em = disnake.Embed(title='**🌴 Razor/Venture**', description=descrip, color=disnake.Colour.dark_magenta)
+    em.set_footer(text=' 🌴 **RazorVerse** *!*')
+    await ctx.send(embed=em, ephemeral=True)
 
     
 @bot.event
@@ -485,21 +521,22 @@ async def on_application_command_error(ctx, error):
     else:
         pass
 
+class Server():
+    app = Flask('')
 
-app = Flask('')
+    @app.route('/')
+    def main():
+        return f"Logged in as {bot.user}."
 
-@app.route('/')
-def main():
-    return f"Logged in as {bot.user}."
+    def run():
+        Server.app.run(host="0.0.0.0", port=8080)
 
-def run():
-    app.run(host="0.0.0.0", port=8080)
+    def keep_alive():
+        server = Thread(target=Server.run)
+        server.start()
 
-def keep_alive():
-    server = Thread(target=run)
-    server.start()
-
-keep_alive()
+    keep_alive()
 
 
 bot.run(os.getenv('TOKEN'))
+
