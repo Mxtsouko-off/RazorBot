@@ -102,6 +102,23 @@ bot = commands.Bot(
     command_sync_flags=command_sync_flags,
 )
 
+class Server():
+    app = Flask('')
+
+    @app.route('/')
+    def main():
+        return f"Logged in as {bot.user}."
+
+    def run():
+        Server.app.run(host="0.0.0.0", port=8080)
+
+    def keep_alive():
+        server = Thread(target=Server.run)
+        server.start()
+
+    keep_alive()
+
+
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user}.")
@@ -521,21 +538,6 @@ async def on_application_command_error(ctx, error):
     else:
         pass
 
-class Server():
-    app = Flask('')
-
-    @app.route('/')
-    def main():
-        return f"Logged in as {bot.user}."
-
-    def run():
-        Server.app.run(host="0.0.0.0", port=8080)
-
-    def keep_alive():
-        server = Thread(target=Server.run)
-        server.start()
-
-    keep_alive()
 
 
 bot.run(os.getenv('TOKEN'))
