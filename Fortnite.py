@@ -523,7 +523,7 @@ descrip = '''
     
 @bot.slash_command(description='Venture Info')
 async def venture(ctx):
-    em = disnake.Embed(title='**🌴 Razor/Venture**', description=descrip, color=disnake.Colour.dark_magenta)
+    em = disnake.Embed(title='**🌴 Razor/Venture**', description=descrip, color=disnake.Color.dark_orange())
     em.set_footer(text=' 🌴 **RazorVerse** *!*')
     await ctx.send(embed=em, ephemeral=True)
 
